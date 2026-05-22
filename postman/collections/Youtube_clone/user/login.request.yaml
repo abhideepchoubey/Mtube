@@ -1,6 +1,6 @@
 $kind: http-request
 name: login
-url: "{{server}}/users/logout"
+url: "{{server}}/users/login"
 method: POST
 body:
   type: formdata

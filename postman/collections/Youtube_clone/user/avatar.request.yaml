@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{server}}/users/avatar"
+method: PATCH
+order: 4503574731353741

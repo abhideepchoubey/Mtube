@@ -4,6 +4,7 @@ import {User} from "../models/user.model.js"
 import {uploadOnCloudinary , deleteFromCloudinary,getPublicIdFromUrl} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken"
+import mongoose from "mongoose"
 
 
 
@@ -109,7 +110,7 @@ const registerUser = asyncHandler(async (req, res) => {
     )
 })
 
-const loginUser = asyncHandler(async (req,res) => {
+const loginUser = asyncHandler(async (req,res) => { 
     //request email/username and password from user,req.body->data
     //username or email
     //check if any user exists with that email/username
@@ -176,8 +177,12 @@ const logOutUser = asyncHandler(async(req,res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set : {
-                refreshToken : undefined
+            // $set : {
+            //     refreshToken : undefined
+            // }
+            $unset:{
+                refreshToken:1 
+                //this removes the field from document
             }
         },
         {
@@ -306,8 +311,8 @@ const updateAccountDetails = asyncHandler(async(req,res)=>
         ))
 })
 
-const updateUserAvatar = asyncHandler(async(req,res)
-=>{
+const updateUserAvatar = asyncHandler(async(req,res)=>
+    {
     const avatarLocalPath = req.file?.path
     if(!avatarLocalPath){
         throw new ApiError(400,"Avatar file is missing")
@@ -341,8 +346,7 @@ const updateUserAvatar = asyncHandler(async(req,res)
 })
 
 // delete old cover image
-const updateUserCoverImage = asyncHandler(async(req,res)
-=>{
+const updateUserCoverImage = asyncHandler(async(req,res)=>{
     const coverImageLocalPath = req.file?.path
     if(!coverImageLocalPath){
         throw new ApiError(400,"Cover Image file is missing")

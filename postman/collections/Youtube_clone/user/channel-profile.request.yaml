@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{server}}/c/:username"
+method: GET
+pathVariables:
+  username: ""
+order: 4503596348961430
