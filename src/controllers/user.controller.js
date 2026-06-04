@@ -335,14 +335,14 @@ const updateUserAvatar = asyncHandler(async(req,res)=>
         const publicId = getPublicIdFromUrl(existingUser.avatar);
         await deleteFromCloudinary(publicId);
         }
-        return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                user,
-                "Avatar Image updated successfully"
-        ))
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            user,
+            "Avatar Image updated successfully"
+    ))
 })
 
 // delete old cover image

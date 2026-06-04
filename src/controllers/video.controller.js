@@ -10,28 +10,68 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
     //TODO: get all videos based on query, sort, pagination
-    
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
     // TODO: get video, upload to cloudinary, create video
+    if (!title?.trim()) {
+        throw new ApiError(400, "Title is required");
+    }
+
+    if (!description?.trim()) {
+        throw new ApiError(400, "Description is required");
+    }
+    // console.log(req.files)
+    const videoLocalPath = req.files?.videoFile?.[0]?.path
+    if(!videoLocalPath){
+        throw new ApiError(400,"Video file is missing")
+    }
+    const videoFile = await uploadOnCloudinary(videoLocalPath)
+    if(!videoFile?.url){
+        throw new ApiError(400,"Error while uploading the Video")
+    }
+    const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path
+    if(!thumbnailLocalPath){
+        throw new ApiError(400,"Thumbnail file is missing")
+    }
+    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+    if(!thumbnail?.url){
+        throw new ApiError(400,"Error while uploading the thumbnail")
+    }
+    const video = await Video.create({
+        videoFile: videoFile.url,
+        thumbnail: thumbnail.url,
+        title:title.trim(),
+        description:description.trim(),
+        owner: req.user._id,
+        duration: videoFile.duration
+    })
+    const createdVideo = await Video.findById(video._id)
+
+    if(!createdVideo) {
+        throw new ApiError(500 ,"Something went wrong while uploading a video")
+    }
+
+    return res.status(201).json(
+        new ApiResponse(201, createdVideo ,"Video uploaded successfully")
+    )
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: get video by id
+    //TODO: get videoLocalPath by id
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
+    //TODO: update videoLocalPath details like title, description, thumbnail
 
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: delete video
+    //TODO: delete videoLocalPath
 })
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
