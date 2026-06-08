@@ -47,26 +47,74 @@ const publishAVideo = asyncHandler(async (req, res) => {
         owner: req.user._id,
         duration: videoFile.duration
     })
-    const createdVideo = await Video.findById(video._id)
+    // const createdVideo = await Video.findById(video._id)
 
-    if(!createdVideo) {
-        throw new ApiError(500 ,"Something went wrong while uploading a video")
-    }
+    // if(!createdVideo) {
+    //     throw new ApiError(500 ,"Something went wrong while uploading a video")
+    // }
 
     return res.status(201).json(
-        new ApiResponse(201, createdVideo ,"Video uploaded successfully")
+        new ApiResponse(201, video ,"Video uploaded successfully")
     )
 })
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: get videoLocalPath by id
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new ApiError(400, "Invalid video id");
+    }
+    // const video = await Video.aggregate([
+    //     {
+    //         $match:{
+    //             _id:new mongoose.Types.ObjectId(videoId)
+    //         }
+    //     },
+    //     {
+    //         $project:{
+    //             videoFile: 1,
+    //             thumbnail: 1,
+
+    //             title: 1,
+    //             description:1,
+    //             owner: 1,
+    //             duration: 1
+    //         }
+    //     }
+    // ])
+    // if(!video?.length){
+    //     throw new ApiError(404,"Video doesn't exists")
+    // }
+    // return res
+    // .status(200)
+    // .json(
+    //     new ApiResponse(
+    //         200,
+    //         video[0],
+    //         "Video fetched Successfully")
+    // )
+    const video = await Video.findById(videoId)
+    .populate("owner", "fullname username avatar");
+    if (!video) {
+        throw new ApiError(404, "Video doesn't exist");
+    }
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            video,
+            "Video fetched successfully"
+        )
+    )
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: update videoLocalPath details like title, description, thumbnail
-
+    if(!videoId?.trim()){
+        throw new ApiError(400,"videoId is missing")
+    }
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
